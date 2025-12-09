@@ -1,0 +1,46 @@
+@startuml Azure Flow Diagram
+
+!define AzurePuml https://raw.githubusercontent.com/RicardoNiepel/Azure-PlantUML/master/dist
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define SpritesUrl https://raw.githubusercontent.com/rabelenda/cicon-plantuml-sprites/v1.0/sprites
+!define IconsUrl https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/v2.3.0
+
+!includeurl IconsUrl/font-awesome-5/mobile_alt.puml
+!includeurl IconsUrl/font-awesome-5/user.puml
+!includeurl IconsUrl/common.puml
+
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/Web/AzureWebApp.puml
+!includeurl AzurePuml/Compute/AzureVirtualMachineClassic.puml
+!includeurl AzurePuml/Databases/AzureDatabaseForPostgreSQL.puml
+!includeurl AzurePuml/Databases/AzureSqlStretchDatabase.puml
+
+!define _defaultColor #CCCCCC
+!define _changeColor #FFFFFF
+!define _offcolor #FF0000
+
+left to right direction
+
+Boundary(c100, "The_flow_description", "Transitional architecture") {
+
+Person(DefaultUser, "User", "A default user of the system")
+
+System_Boundary(c2, "Boundary_one") {
+    AzureSqlStretchDatabase(PartnerOne, "Partner One", "A random partner") _defaultColor
+    AzureSqlStretchDatabase(PartnerTwo, "Partner Two", "Another random partner") _defaultColor
+}
+
+System_Boundary(c1, "Boundary_three") {
+
+    AzureWebApp(GatewayApi, "GatewayApi", "Web API acting as a gateway.", "[C#, .Net Core]")
+    AzureWebApp(InternalApi, "Internal API \n [API nickname]", "Specific internal API", "[C#, .Net Core]")
+    AzureDatabaseForPostgreSQL(PostgresDatabase, "Main Database", "Primary data storage")
+
+    Rel(DefaultUser, GatewayApi, "1 - A user makes a request to the gateway")
+    Rel(GatewayApi, InternalApi, "2 - The gateway processes the request and forwards it to the internal API")
+    Rel(InternalApi, PostgresDatabase, "3 - The internal API queries the main database for information")
+    Rel(InternalApi, PartnerOne, "4 - The internal API interacts with Partner One for additional data")
+    Rel(InternalApi, PartnerTwo, "5 - The internal API interacts with Partner Two sending necessary information")
+}
+
+@enduml
